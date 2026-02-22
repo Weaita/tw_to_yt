@@ -1,0 +1,48 @@
+name: Download Twitch VOD and Upload to YouTube
+on:
+  workflow_dispatch:
+    inputs:
+      twitch_url:
+        description: 'Twitch VOD URL'
+        required: true
+        type: string
+      video_title:
+        description: 'Title for the video on YouTube'
+        required: true
+        type: string
+
+jobs:
+  process-vod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install yt-dlp google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+
+      - name: Download VOD with yt-dlp
+        run: |
+          echo "--- STARTING DOWNLOAD: ${{ inputs.twitch_url }} ---"
+          yt-dlp \
+            -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]" \
+            -N 4 \
+            --merge-output-format mp4 \
+            -o "video_temp.mp4" \
+            "${{ inputs.twitch_url }}"
+
+      - name: Upload VOD to YouTube
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          TWITCH_URL: ${{ inputs.twitch_url }}
+          VIDEO_TITLE: ${{ inputs.video_title }}
+        run: python upload.py
