@@ -51,7 +51,7 @@ def upload_latest_video():
             status, response = request.next_chunk()
             if status:
                 print(f"Progress: {int(status.progress() * 100)}%")
-        print(f"Upload complete. Video ID: {response.get('id')}")
+        print(f"Upload complete.")
     except Exception as e:
         print(f"Error: {e}")
 

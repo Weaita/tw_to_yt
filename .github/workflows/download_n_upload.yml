@@ -41,8 +41,10 @@ jobs:
 
       - name: Download VOD with yt-dlp
         run: |
-          echo "--- STARTING DOWNLOAD: ${{ inputs.twitch_url }} ---"
+          echo "--- STARTING DOWNLOAD ---"
           yt-dlp \
+            --no-progress \
+            --quiet \
             -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]" \
             -N 4 \
             --merge-output-format mp4 \
