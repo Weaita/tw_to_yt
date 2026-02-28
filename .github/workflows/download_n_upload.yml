@@ -32,25 +32,25 @@ jobs:
           pip install yt-dlp google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
 
       - name: Download VOD with yt-dlp
-        env:
-          TWITCH_VOD_ID: ${{ github.event.client_payload.vod_id }}
         run: |
           echo "--- STARTING DOWNLOAD ---"
 
           yt-dlp \
             --no-progress \
+            --no-warnings \
             --quiet \
-            -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]" \
+            -f "bestvideo[height<=720]+bestaudio/best[height<=720]" \
             -N 4 \
             --merge-output-format mp4 \
             -o "video_temp.mp4" \
-            "https://www.twitch.tv/videos/$TWITCH_VOD_ID"
+            "https://www.twitch.tv/videos/${{ github.event.client_payload.vod_id }}"
 
       - name: Upload VOD to YouTube
+        run: |
+          export VIDEO_TITLE="${{ github.event.client_payload.video_title }}"
+          export TWITCH_URL="https://www.twitch.tv/videos/${{ github.event.client_payload.vod_id }}"
+          python upload.py
         env:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
-          TWITCH_URL: ${{ inputs.twitch_url }}
-          VIDEO_TITLE: ${{ github.event.client_payload.video_title }}
-        run: python upload.py
