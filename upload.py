@@ -43,7 +43,7 @@ def upload_latest_video():
                 'selfDeclaredMadeForKids': False
             }
         }
-        print(f"Uploading video: {VIDEO_TITLE}")
+        ## print(f"Uploading video: {VIDEO_TITLE}")
         media = MediaFileUpload(video_file, chunksize=-1, resumable=True)
         request = youtube.videos().insert(part=','.join(body.keys()), body=body, media_body=media)
         response = None
