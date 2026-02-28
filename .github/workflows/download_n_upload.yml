@@ -29,7 +29,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install yt-dlp google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+          pip install yt-dlp google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client requests
+          
+      - name: Install TwitchDownloaderCLI
+        run: |
+          wget https://github.com/lay295/TwitchDownloader/releases/download/1.56.4/TwitchDownloaderCLI-1.56.4-Linux-x64.zip
+          unzip TwitchDownloaderCLI-1.56.4-Linux-x64.zip
+          chmod +x TwitchDownloaderCLI
 
       - name: Download VOD with yt-dlp
         run: |
@@ -44,6 +50,19 @@ jobs:
             --merge-output-format mp4 \
             -o "video_temp.mp4" \
             "https://www.twitch.tv/videos/${{ github.event.client_payload.vod_id }}"
+
+      - name: Download chat log with TwitchDownloaderCLI
+        run: |
+          echo "--- DOWNLOADING CHAT LOG ---"
+          ./TwitchDownloaderCLI chatdownload \
+            -u ${{ github.event.client_payload.vod_id }} \
+            -o "chat.json"
+          
+      - name: Send chat to Discord
+        run: |
+          python send_chat_discord.py
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Upload VOD to YouTube
         run: |
