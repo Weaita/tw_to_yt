@@ -27,6 +27,11 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Install ffmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install dependencies
         run: |
           pip install yt-dlp google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client requests
