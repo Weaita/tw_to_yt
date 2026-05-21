@@ -80,10 +80,11 @@ jobs:
 
       - name: Upload VOD to YouTube
         run: |
-          export VIDEO_TITLE="${{ github.event.client_payload.video_title }}"
-          export TWITCH_URL="https://www.twitch.tv/videos/${{ github.event.client_payload.vod_id }}"
           python upload.py
         env:
+          VIDEO_TITLE: ${{ github.event.client_payload.video_title }}
+          TWITCH_URL: https://www.twitch.tv/videos/${{ github.event.client_payload.vod_id }}
+      
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
